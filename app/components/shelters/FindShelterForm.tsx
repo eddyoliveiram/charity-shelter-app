@@ -4,16 +4,22 @@ import { Button } from '../ui/Button';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from '../ui/Select';
 import { Textarea } from '../ui/Textarea';
 
-export default function ProvideShelterForm() {
+export default function FindShelterForm() {
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        window.location.href = '/shelters/available';
+    };
+
     return (
-        <form className="space-y-4 mt-4">
+        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="name">Nome</Label>
                     <Input id="name" placeholder="Seu nome" />
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">Email (opcional)</Label>
                     <Input id="email" type="email" placeholder="seu@email.com" />
                 </div>
             </div>
@@ -29,11 +35,11 @@ export default function ProvideShelterForm() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                    <Label htmlFor="capacity">Capacidade</Label>
-                    <Input id="capacity" type="number" placeholder="Número máximo de pessoas" />
+                    <Label htmlFor="group-size">Número de Pessoas</Label>
+                    <Input id="group-size" type="number" placeholder="Número de pessoas no grupo" />
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="food">Tipo de Suporte</Label>
+                    <Label htmlFor="food">Necessidade</Label>
                     <Select id="food">
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder="Selecione" />
@@ -49,9 +55,9 @@ export default function ProvideShelterForm() {
             </div>
             <div className="space-y-2">
                 <Label htmlFor="description">Descrição</Label>
-                <Textarea id="description" rows={3} placeholder="Informações adicionais sobre seu abrigo" />
+                <Textarea id="description" rows={3} placeholder="Informações adicionais sobre sua situação" />
             </div>
-            <Button type="submit" className="w-full">Fornecer Abrigo</Button>
+            <Button type="submit" className="w-full">Encontrar Abrigo</Button>
         </form>
     );
 }

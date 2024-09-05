@@ -1,8 +1,7 @@
-import Header from '@/app/components/layout/header';
+import Header from '@/app/components/layout/Header';
 import Footer from '@/app/components/layout/Footer';
-import './globals.css';
+import '@/app/globals.css';
 import { ReactNode } from 'react';
-
 
 interface LayoutProps {
     children: ReactNode;
@@ -16,11 +15,12 @@ export const metadata = {
 export default function RootLayout({ children }: LayoutProps) {
     return (
         <html lang="pt-BR">
-        <head>
-        </head>
-        <body>
+        <head />
+        <body className="flex flex-col min-h-screen">
         <Header />
-        <main>{children}</main>
+        <main className="flex-grow mx-10">
+            {children}
+        </main>
         <Footer />
         </body>
         </html>
