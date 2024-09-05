@@ -151,7 +151,7 @@ export default function ShelterListWithPagination() {
                     <button
                         key={number}
                         onClick={() => paginate(number)}
-                        className={`mx-1 px-3 py-1 border ${
+                        className={`mx-2 px-6 py-4 border ${
                             currentPage === number ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'
                         }`}
                     >

@@ -37,7 +37,7 @@ export default function HomePage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
 
-                    <div>
+                    <div className="rounded-lg border bg-card text-card-foreground shadow-sm py-10 px-10">
                         <ShelterHeader
                             title="Fornecer Abrigo"
                             subtitle="Ofereça abrigo temporário para vítimas de enchentes."
@@ -45,7 +45,7 @@ export default function HomePage() {
                         />
                         <ProvideShelterForm/>
                     </div>
-                    <div>
+                    <div className="rounded-lg border bg-card text-card-foreground shadow-sm py-10 px-10">
                         <ShelterHeader
                             title="Encontrar Abrigo"
                             subtitle="Encontre abrigo temporário após as enchentes."
