@@ -100,7 +100,7 @@ export default function ShelterListWithPagination() {
 
     return (
         <div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-4">
                 {currentShelters.map((shelter, index) => (
                     <Card key={index} className="space-y-4">
                         <CardHeader>

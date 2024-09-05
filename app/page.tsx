@@ -6,6 +6,7 @@ import ShelterHeader from '@/app/components/shelters/ShelterHeader';
 import { Separator } from '@/app/components/ui/Separator';
 import HomeIcon from "@/app/components/icons/HomeIcon";
 import SearchIcon from "@/app/components/icons/SearchIcon";
+import {Button} from "@/app/components/ui/button";
 export default function HomePage() {
 
     return (
@@ -32,9 +33,17 @@ export default function HomePage() {
                 </div>
             </div>
 
+            <div className="w-full max-w-6xl mx-auto py-4 md:py-4 ">
+                <div className="flex justify-center ">
+                    <Button
+                        type="button"
+                        className="py-6 mb-6 w-full md:w-auto"
+                        onClick={() => window.location.href = '/login'}
+                    >
+                        Já tem uma conta? Clique aqui.
+                    </Button>
 
-            <div className="w-full max-w-6xl mx-auto py-12 md:py-16 ">
-
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
 
                     <div className="rounded-lg border bg-card text-card-foreground shadow-sm py-10 px-10">

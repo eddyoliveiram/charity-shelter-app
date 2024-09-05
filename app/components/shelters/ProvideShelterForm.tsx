@@ -20,7 +20,7 @@ export default function ProvideShelterForm() {
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" placeholder="seu@email.com" />
+                    <Input id="email" type="email" placeholder="seu@email.com"  />
                 </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

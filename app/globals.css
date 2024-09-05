@@ -80,4 +80,22 @@
     width: auto; /* Mantém a proporção da imagem */
     object-fit: cover; /* Ajusta a imagem para cobrir o container */
   }
+  input, textarea, select {
+    border: 0;
+    background-color: #faf9ff;
+    border-radius: 10px;
+    outline: none;
+    box-shadow: none;
+    padding: 0.5rem;
+  }
+
+  .borderless {
+    border: 0;
+    background-color: #faf9ff;
+    border-radius: 10px;
+    outline: none;
+    box-shadow: none;
+    padding: 0.5rem;
+  }
+
 }

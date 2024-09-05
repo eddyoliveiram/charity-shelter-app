@@ -21,7 +21,7 @@ export default function AvailableShelters() {
                         className={`text-xl py-6 px-4 ${activeTab === 'shelters' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}
                         onClick={() => setActiveTab('shelters')}
                     >
-                        Solicitações
+                        Abrigos
                     </button>
                     <button
                         className={`text-xl py-6 px-4 ${activeTab === 'dados' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}
@@ -54,12 +54,12 @@ export default function AvailableShelters() {
                             <div className="space-y-2">
                                 <label htmlFor="name">Nome</label>
                                 <input id="name" placeholder="Seu nome"
-                                       className="w-full border border-input p-2 rounded"/>
+                                       className="w-full borderless"/>
                             </div>
                             <div className="space-y-2">
                                 <label htmlFor="email">Email</label>
                                 <input id="email" type="email" placeholder="seu@email.com"
-                                       className="w-full border border-input p-2 rounded"/>
+                                       className="w-full borderless"/>
                             </div>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
