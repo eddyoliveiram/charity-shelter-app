@@ -57,7 +57,7 @@ export default function ProvideShelterForm() {
                 <Label htmlFor="description">Descrição</Label>
                 <Textarea id="description" rows={3} placeholder="Informações adicionais sobre seu abrigo" />
             </div>
-            <Button type="submit" className="w-full">Fornecer Abrigo</Button>
+            <Button type="submit" className="w-full py-6">Fornecer Abrigo</Button>
         </form>
     );
 }

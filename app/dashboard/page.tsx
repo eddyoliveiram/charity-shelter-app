@@ -86,14 +86,13 @@ export default function ShelterDashboard() {
                         ))}
                     </ul>
 
-                    {/* Paginação */}
                     <div className="flex justify-center mt-6">
                         {pageNumbers.map(number => (
                             <button
                                 key={number}
                                 onClick={() => paginate(number)}
-                                className={`mx-1 px-3 py-1 border ${
-                                    currentPage === number ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'
+                                className={`mx-2 px-6 py-4 text-lg border rounded ${
+                                    currentPage === number ? 'bg-primary text-primary-foreground' : ' '
                                 }`}
                             >
                                 {number}
@@ -159,7 +158,7 @@ export default function ShelterDashboard() {
                                       className="w-full border border-input p-2 rounded"></textarea>
                         </div>
 
-                        <Button type="submit" className="w-full bg-primary text-primary-foreground">
+                        <Button type="submit" className="w-full bg-primary text-primary-foreground py-6">
                             Salvar
                         </Button>
                     </form>

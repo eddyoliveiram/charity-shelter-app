@@ -100,7 +100,6 @@ export default function ShelterListWithPagination() {
 
     return (
         <div>
-            {/* Lista de Abrigos Paginados */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {currentShelters.map((shelter, index) => (
                     <Card key={index} className="space-y-4">
@@ -145,14 +144,13 @@ export default function ShelterListWithPagination() {
                 ))}
             </div>
 
-            {/* Paginação */}
             <div className="flex justify-center mt-6">
                 {pageNumbers.map(number => (
                     <button
                         key={number}
                         onClick={() => paginate(number)}
-                        className={`mx-2 px-6 py-4 border ${
-                            currentPage === number ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'
+                        className={`mx-2 px-6 py-4 text-lg border rounded ${
+                            currentPage === number ? 'bg-primary text-primary-foreground' : ' '
                         }`}
                     >
                         {number}

@@ -102,7 +102,7 @@ export default function AvailableShelters() {
                                       className="w-full border border-input p-2 rounded"></textarea>
                         </div>
 
-                        <Button type="submit" className="w-full bg-primary text-primary-foreground">
+                        <Button type="submit" className="w-full bg-primary text-primary-foreground py-6">
                             Salvar
                         </Button>
                     </form>

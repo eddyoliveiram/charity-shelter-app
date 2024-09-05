@@ -57,7 +57,7 @@ export default function FindShelterForm() {
                 <Label htmlFor="description">Descrição</Label>
                 <Textarea id="description" rows={3} placeholder="Informações adicionais sobre sua situação" />
             </div>
-            <Button type="submit" className="w-full">Encontrar Abrigo</Button>
+            <Button type="submit" className="w-full py-6">Encontrar Abrigo</Button>
         </form>
     );
 }
