@@ -6,6 +6,7 @@ import PhoneIcon from '../icons/PhoneIcon';
 import UserIcon from '../icons/UserIcon';
 import UsersIcon from '../icons/UsersIcon';
 import UtensilsIcon from '../icons/UtensilsIcon';
+import {Button} from "@/app/components/ui/button";
 
 export default function ShelterListWithPagination() {
     const shelters = [
@@ -109,35 +110,35 @@ export default function ShelterListWithPagination() {
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-2">
+
                                 <div className="flex items-center gap-2">
-                                    <UserIcon className="w-5 h-5" />
+                                    <UserIcon className="w-5 h-5"/>
                                     <span>{shelter.name}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <PhoneIcon className="w-5 h-5" />
+                                    <PhoneIcon className="w-5 h-5"/>
                                     <span>{shelter.phone}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <HomeIcon size={20} className="w-5 h-5" />
+                                    <HomeIcon size={20} className="w-5 h-5"/>
                                     <span>{shelter.location}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <UsersIcon className="w-5 h-5" />
+                                    <UsersIcon className="w-5 h-5"/>
                                     <span>Capacidade: {shelter.capacity} pessoas</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <UtensilsIcon className="w-5 h-5" />
+                                    <UtensilsIcon className="w-5 h-5"/>
                                     <span>{shelter.hasFood ? 'Alimentação disponível' : 'Sem alimentação'}</span>
                                 </div>
-
-                                <div className="flex gap-4 mt-4">
-                                    <button className="bg-green-500 text-white py-1 px-4 rounded hover:bg-green-600">
-                                        Solicitar
-                                    </button>
-                                    <button className="bg-red-500 text-white py-1 px-4 rounded hover:bg-red-600">
-                                        Cancelar
-                                    </button>
-                                </div>
+                            </div>
+                            <div className="flex mt-4">
+                                <Button className="bg-primary text-primary-foreground py-1 px-4 mr-2 rounded">
+                                    Solicitar
+                                </Button>
+                                <Button className="bg-destructive text-destructive-foreground py-1 px-4 rounded">
+                                    Cancelar
+                                </Button>
                             </div>
                         </CardContent>
                     </Card>
@@ -158,6 +159,7 @@ export default function ShelterListWithPagination() {
                     </button>
                 ))}
             </div>
+
         </div>
     );
 }

@@ -17,8 +17,26 @@ export default function HomePage() {
             {/*        </button>*/}
             {/*    </p>*/}
             {/*</div>*/}
-            <div className="w-full max-w-6xl mx-auto py-12 md:py-16 lg:py-20">
+            <div className="flex flex-col items-center">
+                <div className="flex items-center space-x-4 mt-6">
+                    <img
+                        src="https://cdn-icons-png.flaticon.com/512/4531/4531744.png"
+                        alt="Descrição da Imagem"
+                        className="image-height"
+                    />
+                    <div className="custom-text text-center italic">
+                        Dezenas de milhares de vítimas da enchente no RS passarão frio neste inverno de 2024. <br/>
+                        Se você não puder doar, considere abrir as portas de sua casa e oferecer abrigo para essas
+                        pessoas.
+                    </div>
+                </div>
+            </div>
+
+
+            <div className="w-full max-w-6xl mx-auto py-12 md:py-16 ">
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+
                     <div>
                         <ShelterHeader
                             title="Fornecer Abrigo"

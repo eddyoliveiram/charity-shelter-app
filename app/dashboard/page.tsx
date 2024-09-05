@@ -1,51 +1,163 @@
+"use client";
+import { useState } from "react";
+import { Button } from "@/app/components/ui/button";
+
 export default function ShelterDashboard() {
+    const [activeTab, setActiveTab] = useState('solicitacoes');
+
+    // Lista de solicitações simuladas
+    const solicitacoes = [
+        { nome: 'João da Silva', pessoas: 4, necessidade: 'Hospedagem e Alimentação' },
+        { nome: 'Maria dos Santos', pessoas: 3, necessidade: 'Apenas Hospedagem' },
+        { nome: 'Pedro Oliveira', pessoas: 2, necessidade: 'Hospedagem e Alimentação' },
+        { nome: 'Ana Pereira', pessoas: 5, necessidade: 'Apenas Hospedagem' },
+        { nome: 'Carlos Souza', pessoas: 6, necessidade: 'Hospedagem e Alimentação' },
+        { nome: 'Lucia Dias', pessoas: 3, necessidade: 'Apenas Hospedagem' },
+    ];
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const solicitacoesPerPage = 3;
+
+    // Determina as solicitações da página atual
+    const indexOfLastSolicitacao = currentPage * solicitacoesPerPage;
+    const indexOfFirstSolicitacao = indexOfLastSolicitacao - solicitacoesPerPage;
+    const currentSolicitacoes = solicitacoes.slice(indexOfFirstSolicitacao, indexOfLastSolicitacao);
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+    const pageNumbers = [];
+    for (let i = 1; i <= Math.ceil(solicitacoes.length / solicitacoesPerPage); i++) {
+        pageNumbers.push(i);
+    }
+
     return (
         <div className="container mx-auto py-12">
-            <h1 className="text-3xl font-bold mb-6">Solicitações para o seu Abrigo</h1>
-            <p>Abaixo estão as solicitações feitas por pessoas que desejam se abrigar no local que você cadastrou.</p>
+            <h1 className="text-3xl font-bold mb-6">Dashboard do Abrigo</h1>
 
-            <ul className="mt-4">
-                {/* Simulação de solicitação para o abrigo */}
-                <li className="border p-4 mb-2">
-                    <div>
-                        <strong>Nome:</strong> João da Silva
-                    </div>
-                    <div>
-                        <strong>Número de Pessoas:</strong> 4
-                    </div>
-                    <div>
-                        <strong>Necessidade:</strong> Hospedagem e Alimentação
-                    </div>
-                    <div>
-                        <button className="bg-green-500 text-white py-1 px-4 mr-2 rounded">
-                            Aceitar
-                        </button>
-                        <button className="bg-red-500 text-white py-1 px-4 rounded">
-                            Rejeitar
-                        </button>
-                    </div>
-                </li>
+            <div className="relative mb-6">
+                <div className="">
+                    <button
+                        className={` text-xl py-6 px-4 mr-2 ${activeTab === 'solicitacoes' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}
+                        onClick={() => setActiveTab('solicitacoes')}
+                    >
+                        Solicitações
+                    </button>
+                    <button
+                        className={`text-xl py-6 px-4 ${activeTab === 'dados' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}
+                        onClick={() => setActiveTab('dados')}
+                    >
+                        Alterar Dados Cadastrais
+                    </button>
+                </div>
 
-                <li className="border p-4 mb-2">
-                    <div>
-                        <strong>Nome:</strong> Maria dos Santos
+                <div className="absolute bottom-0 right-0">
+                    <a href="/" className="text-xl py-6 px-4 bg-secondary text-secondary-foreground">
+                        Logout
+                    </a>
+                </div>
+            </div>
+
+            {/* Conteúdo da Aba de Solicitações */}
+            {activeTab === 'solicitacoes' && (
+                <div className="w-full">
+                <h2 className="text-2xl font-bold mb-4">Solicitações para o seu Abrigo</h2>
+                    <p>Abaixo estão as solicitações feitas por pessoas que desejam se abrigar no local que você cadastrou.</p>
+                    <ul className="mt-4">
+                        {currentSolicitacoes.map((solicitacao, index) => (
+                            <li key={index} className="border border-border p-4 mb-2 bg-card text-card-foreground">
+                                <div>
+                                    <strong>Nome:</strong> {solicitacao.nome}
+                                </div>
+                                <div>
+                                    <strong>Número de Pessoas:</strong> {solicitacao.pessoas}
+                                </div>
+                                <div>
+                                    <strong>Necessidade:</strong> {solicitacao.necessidade}
+                                </div>
+                                <div className="mt-4">
+                                    <Button className="bg-primary text-primary-foreground py-1 px-4 mr-2 rounded">
+                                        Aceitar
+                                    </Button>
+                                    <Button className="bg-destructive text-destructive-foreground py-1 px-4 rounded">
+                                        Rejeitar
+                                    </Button>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+
+                    {/* Paginação */}
+                    <div className="flex justify-center mt-6">
+                        {pageNumbers.map(number => (
+                            <button
+                                key={number}
+                                onClick={() => paginate(number)}
+                                className={`mx-1 px-3 py-1 border ${
+                                    currentPage === number ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'
+                                }`}
+                            >
+                                {number}
+                            </button>
+                        ))}
                     </div>
-                    <div>
-                        <strong>Número de Pessoas:</strong> 3
-                    </div>
-                    <div>
-                        <strong>Necessidade:</strong> Apenas Hospedagem
-                    </div>
-                    <div>
-                        <button className="bg-green-500 text-white py-1 px-4 mr-2 rounded">
-                            Aceitar
-                        </button>
-                        <button className="bg-red-500 text-white py-1 px-4 rounded">
-                            Rejeitar
-                        </button>
-                    </div>
-                </li>
-            </ul>
+                </div>
+            )}
+
+            {/* Conteúdo da Aba de Dados Cadastrais */}
+            {activeTab === 'dados' && (
+                <div className="w-full lg:w-1/2">
+                    <h2 className="text-2xl font-bold mb-4">Alterar Dados Cadastrais</h2>
+                    <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label htmlFor="name">Nome</label>
+                                <input id="name" placeholder="Seu nome" className="w-full border border-input p-2 rounded"/>
+                            </div>
+                            <div className="space-y-2">
+                                <label htmlFor="email">Email</label>
+                                <input id="email" type="email" placeholder="seu@email.com" className="w-full border border-input p-2 rounded"/>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label htmlFor="phone">Telefone</label>
+                                <input id="phone" type="tel" placeholder="(00) 00000-0000" className="w-full border border-input p-2 rounded"/>
+                            </div>
+                            <div className="space-y-2">
+                                <label htmlFor="password">Senha</label>
+                                <input id="password" type="password" placeholder="Sua senha" className="w-full border border-input p-2 rounded"/>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label htmlFor="capacity">Capacidade</label>
+                                <input id="capacity" type="number" placeholder="Número máximo de pessoas" className="w-full border border-input p-2 rounded"/>
+                            </div>
+                            <div className="space-y-2">
+                                <label htmlFor="food">Tipo de Suporte</label>
+                                <select id="food" className="w-full border border-input p-2 rounded">
+                                    <option value="apenas-hospedagem">Apenas Hospedagem</option>
+                                    <option value="hospedagem-alimentacao">Hospedagem e Alimentação</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <label htmlFor="description">Descrição</label>
+                            <textarea id="description" rows={3} placeholder="Informações adicionais sobre seu abrigo" className="w-full border border-input p-2 rounded"></textarea>
+                        </div>
+
+                        <Button type="submit" className="w-full bg-primary text-primary-foreground">
+                            Salvar
+                        </Button>
+                    </form>
+                </div>
+            )}
         </div>
     );
+}
+
+// Função de envio (exemplo de implementação)
+function handleSubmit(event) {
+    event.preventDefault();
+    // lógica para lidar com o envio do formulário
 }

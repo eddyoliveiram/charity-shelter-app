@@ -66,4 +66,18 @@
   body {
     @apply bg-background text-foreground;
   }
+  button {
+    border-radius: var(--radius);
+  }
+  .custom-text {
+    color: var(--foreground); /* Cor do texto */
+    font-size: 1.25rem; /* Tamanho da fonte */
+    text-align: left; /* Alinhar texto à esquerda */
+    max-width: calc(100% - 100px); /* Ajuste a largura máxima para acomodar a imagem */
+  }
+  .image-height {
+    height: 100px; /* Defina a altura da imagem conforme necessário */
+    width: auto; /* Mantém a proporção da imagem */
+    object-fit: cover; /* Ajusta a imagem para cobrir o container */
+  }
 }
