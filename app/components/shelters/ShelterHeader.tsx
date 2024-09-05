@@ -11,8 +11,12 @@ export default function ShelterHeader({ title, subtitle, icon }: ShelterHeaderPr
         <div className="flex items-center space-x-4">
             <div className="flex-shrink-0">{icon}</div>
             <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tight">{title}</h2>
-                <p className="text-muted-foreground">{subtitle}</p>
+                <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
+                    {title}
+                </h2>
+                <p className="text-sm md:text-base text-muted-foreground">
+                    {subtitle}
+                </p>
             </div>
         </div>
     );

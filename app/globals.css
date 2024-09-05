@@ -75,6 +75,13 @@
     text-align: left; /* Alinhar texto à esquerda */
     max-width: calc(100% - 100px); /* Ajuste a largura máxima para acomodar a imagem */
   }
+
+  @media (max-width: 768px) {
+    .custom-text {
+      font-size: 0.8rem;
+    }
+  }
+
   .image-height {
     height: 100px; /* Defina a altura da imagem conforme necessário */
     width: auto; /* Mantém a proporção da imagem */
