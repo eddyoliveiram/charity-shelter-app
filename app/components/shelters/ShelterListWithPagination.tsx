@@ -1,12 +1,9 @@
 "use client";
 import { useState } from 'react';
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '../ui/Card';
-import HomeIcon from '../icons/HomeIcon';
-import PhoneIcon from '../icons/PhoneIcon';
-import UserIcon from '../icons/UserIcon';
-import UsersIcon from '../icons/UsersIcon';
-import UtensilsIcon from '../icons/UtensilsIcon';
-import {Button} from "@/app/components/ui/button";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPhone, faHome, faUser, faUsers, faUtensils, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { Button } from "@/app/components/ui/button";
 
 export default function ShelterListWithPagination() {
     const shelters = [
@@ -109,33 +106,34 @@ export default function ShelterListWithPagination() {
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-2">
-
                                 <div className="flex items-center gap-2">
-                                    <UserIcon className="w-5 h-5"/>
+                                    <FontAwesomeIcon icon={faUser} className="w-5 h-5" />
                                     <span>{shelter.name}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <PhoneIcon className="w-5 h-5"/>
+                                    <FontAwesomeIcon icon={faPhone} className="w-5 h-5" />
                                     <span>{shelter.phone}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <HomeIcon size={20} className="w-5 h-5"/>
+                                    <FontAwesomeIcon icon={faHome} className="w-5 h-5" />
                                     <span>{shelter.location}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <UsersIcon className="w-5 h-5"/>
+                                    <FontAwesomeIcon icon={faUsers} className="w-5 h-5" />
                                     <span>Capacidade: {shelter.capacity} pessoas</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <UtensilsIcon className="w-5 h-5"/>
+                                    <FontAwesomeIcon icon={faUtensils} className="w-5 h-5" />
                                     <span>{shelter.hasFood ? 'Alimentação disponível' : 'Sem alimentação'}</span>
                                 </div>
                             </div>
                             <div className="flex mt-4">
                                 <Button className="bg-primary text-primary-foreground py-1 px-4 mr-2 rounded">
+                                    <FontAwesomeIcon icon={faCheck} className="mr-2" />
                                     Solicitar
                                 </Button>
                                 <Button className="bg-destructive text-destructive-foreground py-1 px-4 rounded">
+                                    <FontAwesomeIcon icon={faTimes} className="mr-2" />
                                     Cancelar
                                 </Button>
                             </div>
@@ -149,15 +147,14 @@ export default function ShelterListWithPagination() {
                     <button
                         key={number}
                         onClick={() => paginate(number)}
-                        className={`mx-2 px-6 py-4 text-lg border rounded ${
-                            currentPage === number ? 'bg-primary text-primary-foreground' : ' '
+                        className={`mx-1 px-4 py-1 text-lg border rounded ${
+                            currentPage === number ? 'bg-primary text-primary-foreground' : ''
                         }`}
                     >
                         {number}
                     </button>
                 ))}
             </div>
-
         </div>
     );
 }

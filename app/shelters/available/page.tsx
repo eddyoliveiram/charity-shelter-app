@@ -4,6 +4,8 @@ import ShelterListWithPagination from "@/app/components/shelters/ShelterListWith
 import { Button } from "@/app/components/ui/button";
 import { Label } from "@/app/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/app/components/ui/select";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {faSignOutAlt, faHouseUser, faUserCog, faSave, faClipboardList, faUser} from '@fortawesome/free-solid-svg-icons';
 
 export default function AvailableShelters() {
     const [activeTab, setActiveTab] = useState('shelters');
@@ -14,33 +16,36 @@ export default function AvailableShelters() {
 
     return (
         <div className="container mx-auto py-12">
-            <h1 className="text-3xl font-bold mb-6">Olá, Fulano.</h1>
-            <div className="relative mb-6">
-                <div className="flex flex-col sm:flex-row items-start space-y-2 sm:space-y-0 sm:space-x-2">
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-3xl font-bold">Olá, Fulano.</h1>
+                <a href="/" className="text-xl py-2 px-4 bg-secondary text-secondary-foreground rounded-md">
+                    <FontAwesomeIcon icon={faSignOutAlt} className="mr-2"/> Logout
+                </a>
+            </div>
+
+            <div className="mb-6">
+                <div className="flex flex-col sm:flex-row sm:justify-start items-center space-y-2 sm:space-y-0 sm:space-x-2 mb-6">
                     <button
-                        className={`text-xl py-6 px-4 ${activeTab === 'shelters' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}
+                        className={`flex items-center text-lg sm:text-xl py-4 px-6 w-full sm:w-auto rounded-md  ${activeTab === 'shelters' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}
                         onClick={() => setActiveTab('shelters')}
                     >
-                        Abrigos
+                        <FontAwesomeIcon icon={faHouseUser} className="mr-2"/>
+                        <span>Abrigos</span>
                     </button>
                     <button
-                        className={`text-xl py-6 px-4 ${activeTab === 'dados' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}
+                        className={`flex items-center text-lg sm:text-xl py-4 px-6 w-full sm:w-auto rounded-md  ${activeTab === 'dados' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}
                         onClick={() => setActiveTab('dados')}
                     >
-                        Alterar Dados Cadastrais
+                        <FontAwesomeIcon icon={faUserCog} className="mr-2"/>
+                        <span>Alterar Dados Cadastrais</span>
                     </button>
-                </div>
-
-                <div className="absolute top-0 right-0 mt-6 mr-6">
-                    <a href="/" className="text-xl py-6 px-4 bg-secondary text-secondary-foreground">
-                        Logout
-                    </a>
                 </div>
             </div>
 
+
             {activeTab === 'shelters' && (
                 <div>
-                    <h1 className="text-3xl font-bold mb-4">Abrigos Disponíveis</h1>
+                    <h1 className="text-2xl font-bold mb-4">Abrigos Disponíveis</h1>
                     <p>Abaixo estão os abrigos temporários disponíveis para você.</p>
                     <ShelterListWithPagination/>
                 </div>
@@ -53,8 +58,7 @@ export default function AvailableShelters() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <label htmlFor="name">Nome</label>
-                                <input id="name" placeholder="Seu nome"
-                                       className="w-full borderless"/>
+                                <input id="name" placeholder="Seu nome" className="w-full borderless"/>
                             </div>
                             <div className="space-y-2">
                                 <label htmlFor="email">Email</label>
@@ -103,6 +107,7 @@ export default function AvailableShelters() {
                         </div>
 
                         <Button type="submit" className="w-full bg-primary text-primary-foreground py-6">
+                            <FontAwesomeIcon icon={faSave} className="mr-2"/>
                             Salvar
                         </Button>
                     </form>
