@@ -8,12 +8,12 @@ import ShelterHeader from '@/app/components/shelters/ShelterHeader';
 import { Separator } from '@/app/components/ui/Separator';
 import HomeIcon from "@/app/components/icons/HomeIcon";
 import SearchIcon from "@/app/components/icons/SearchIcon";
-import {Button} from "@/app/components/ui/button";
+import {Button} from "@/app/components/ui/Button";
 
 export default function HomePage() {
     const [providers, setProviders] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchProviders = async () => {

@@ -1,4 +1,6 @@
-export default function UserIcon(props) {
+import React from "react";
+
+export default function UserIcon(props: React.SVGProps<SVGSVGElement>) {
     return (
         <svg
             {...props}

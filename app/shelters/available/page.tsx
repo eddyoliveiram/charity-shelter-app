@@ -1,10 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Button } from "@/app/components/ui/button";
+import { Button } from "@/app/components/ui/Button";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faSignOutAlt, faHouseUser, faSave, faUserCog } from '@fortawesome/free-solid-svg-icons';
 import { getCookie, setCookie } from 'cookies-next';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/app/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/app/components/ui/Select";
 import ShelterListWithPagination from '@/app/components/shelters/ShelterListWithPagination'
 import api from '@/app/utils/axiosConfig';
 import Swal from "sweetalert2"; // Certifique-se de que este caminho está correto
@@ -69,7 +69,7 @@ export default function ShelterDashboard() {
         fetchProfileData();
     }, [seekerId, activeTab]);
 
-    async function handleSubmit(event) {
+    async function handleSubmit(event : React.FormEvent) {
         event.preventDefault();
 
         Swal.fire({
@@ -110,7 +110,7 @@ export default function ShelterDashboard() {
     }
 
     // Função para solicitar abrigo com SweetAlert2
-    const handleRequestShelter = async (providerId) => {
+    const handleRequestShelter = async (providerId :number) => {
         Swal.fire({
             title: 'Tem certeza que deseja solicitar este abrigo?',
             text: 'Esta ação enviará sua solicitação para o provedor.',
@@ -137,7 +137,7 @@ export default function ShelterDashboard() {
     };
 
     // Função para cancelar a solicitação com SweetAlert2
-    const handleCancelRequest = async (requestId) => {
+    const handleCancelRequest = async (requestId :number) => {
         Swal.fire({
             title: 'Tem certeza que deseja cancelar esta solicitação?',
             text: 'Esta ação cancelará sua solicitação ao provedor.',
@@ -193,7 +193,7 @@ export default function ShelterDashboard() {
                 <div>
                     <h1 className="text-2xl font-bold mb-4">Abrigos Disponíveis</h1>
                     <p>Abaixo estão os abrigos temporários disponíveis para você.</p>
-                    <ShelterListWithPagination handleRequestShelter={handleRequestShelter} handleCancelRequest={handleCancelRequest} />
+                    <ShelterListWithPagination />
                 </div>
             )}
 
@@ -227,14 +227,18 @@ export default function ShelterDashboard() {
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <label htmlFor="need_type">Necessidade</label>
-                                    <Select id="need_type" value={profileData.need_type} onValueChange={(value) => setProfileData({ ...profileData, need_type: value })}>
+                                    <Select value={profileData.need_type} onValueChange={(value) => setProfileData({
+                                        ...profileData,
+                                        need_type: value
+                                    })}>
                                         <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Selecione" />
+                                            <SelectValue placeholder="Selecione"/>
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectGroup>
                                                 <SelectItem value="Acomodação">Apenas Acomodação</SelectItem>
-                                                <SelectItem value="Acomodação e Alimentação">Acomodação e Alimentação</SelectItem>
+                                                <SelectItem value="Acomodação e Alimentação">Acomodação e
+                                                    Alimentação</SelectItem>
                                             </SelectGroup>
                                         </SelectContent>
                                     </Select>
@@ -242,7 +246,12 @@ export default function ShelterDashboard() {
                             </div>
                             <div className="space-y-2">
                                 <label htmlFor="seeker_description">Descrição</label>
-                                <textarea id="seeker_description" value={profileData.seeker_description} onChange={(e) => setProfileData({ ...profileData, seeker_description: e.target.value })} rows={3} placeholder="Informações adicionais sobre sua necessidade" className="w-full border border-input p-2 rounded"></textarea>
+                                <textarea id="seeker_description" value={profileData.seeker_description}
+                                          onChange={(e) => setProfileData({
+                                              ...profileData,
+                                              seeker_description: e.target.value
+                                          })} rows={3} placeholder="Informações adicionais sobre sua necessidade"
+                                          className="w-full border border-input p-2 rounded"></textarea>
                             </div>
 
                             <Button type="submit" className="w-full bg-primary text-primary-foreground py-6">

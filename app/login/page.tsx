@@ -2,16 +2,17 @@
 import { useState } from 'react';
 import api from '@/app/utils/axiosConfig';
 import { setCookie } from 'cookies-next';
-import { Button } from "@/app/components/ui/button";
+import { Button } from "@/app/components/ui/Button";
 import Link from "next/link";
 import Swal from 'sweetalert2'; // Importando SweetAlert2
+import { AxiosError } from 'axios';
 
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e : React.FormEvent) => {
         e.preventDefault();
 
         try {
@@ -30,7 +31,7 @@ export default function Login() {
                 path: '/',
                 secure: true, // Garante que o cookie só seja enviado em conexões HTTPS
                 httpOnly: false, // O cookie será acessível no lado do cliente
-                sameSite: 'Strict', // Protege contra CSRF
+                sameSite: 'strict', // Protege contra CSRF
             });
 
             // Armazena as informações do usuário (nome, email e role) em outro cookie
@@ -44,7 +45,7 @@ export default function Login() {
                 path: '/',
                 secure: true,
                 httpOnly: false, // O cookie será acessível no lado do cliente
-                sameSite: 'Strict',
+                sameSite: 'strict',
             });
 
             // Exibe o SweetAlert de sucesso
@@ -67,14 +68,22 @@ export default function Login() {
                 }
             }, 2000);
         } catch (error) {
-            // Exibe o SweetAlert de erro
-            Swal.fire({
-                icon: 'error',
-                title: 'Erro no login',
-                text: error.response?.data?.message || 'Falha no login',
-            });
-
-            setError(error.response?.data?.message || 'Falha no login');
+            if (error instanceof AxiosError) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro no login',
+                    text: error.response?.data?.message || 'Falha no login',
+                });
+                setError(error.response?.data?.message || 'Falha no login');
+            } else {
+                // Caso o erro não seja do tipo AxiosError
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro desconhecido',
+                    text: 'Ocorreu um erro inesperado',
+                });
+                setError('Ocorreu um erro inesperado');
+            }
         }
     };
 

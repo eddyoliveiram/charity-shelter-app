@@ -1,4 +1,6 @@
-export default function UtensilsIcon(props) {
+import React from "react";
+
+export default function UtensilsIcon(props: React.SVGProps<SVGSVGElement>) {
     return (
         <svg
             {...props}

@@ -1,4 +1,10 @@
-export default function HomeIcon({ size = 24, ...props }) {
+import React from "react";
+
+interface HomeIconProps extends React.SVGProps<SVGSVGElement> {
+    size?: number;
+}
+
+export default function HomeIcon({ size = 24, ...props }: HomeIconProps) {
     return (
         <svg
             {...props}

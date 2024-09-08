@@ -7,6 +7,7 @@ import { Label } from '../ui/Label';
 import { Button } from '../ui/Button';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from '../ui/Select';
 import { Textarea } from '../ui/Textarea';
+import Swal from 'sweetalert2';
 
 export default function FindShelterForm() {
     const [formData, setFormData] = useState({
@@ -28,10 +29,20 @@ export default function FindShelterForm() {
         setFormData((prev) => ({ ...prev, needType: value }));
     };
 
+    // Mesma lógica de validação do ProvideShelterForm
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!formData.name || !formData.email || !formData.phone || !formData.password || !formData.groupSize || !formData.needType || !formData.description) {
+            return Swal.fire({
+                title: 'Erro!',
+                text: 'Por favor, preencha todos os campos!',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+
         try {
-            // Faz a requisição diretamente para a API sem usar o axiosConfig
             const response = await axios.post(process.env.NEXT_PUBLIC_API_URL+'/seekers/create', {
                 name: formData.name,
                 email: formData.email,
@@ -45,16 +56,14 @@ export default function FindShelterForm() {
 
             const { token, user } = response.data;
 
-            // Armazenar o token JWT no cookie
             setCookie('token', token, {
-                maxAge: 60 * 60 * 24, // 1 dia de validade
+                maxAge: 60 * 60 * 24,
                 path: '/',
                 secure: true,
                 httpOnly: false,
-                sameSite: 'Strict',
+                sameSite: 'strict',
             });
 
-            // Armazenar as informações do usuário no cookie
             setCookie('user_info', JSON.stringify({
                 id: user.id,
                 name: user.name,
@@ -65,22 +74,35 @@ export default function FindShelterForm() {
                 path: '/',
                 secure: true,
                 httpOnly: false,
-                sameSite: 'Strict',
+                sameSite: 'strict',
             });
 
-            // Redirecionar conforme o papel (role) do usuário
-            if (user.role === 'provider') {
-                window.location.href = '/dashboard';
-            } else if (user.role === 'seeker') {
-                window.location.href = '/shelters/available';
-            } else {
-                window.location.href = '/';
-            }
+            Swal.fire({
+                title: 'Sucesso!',
+                text: 'Abrigo encontrado com sucesso!',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                if (user.role === 'provider') {
+                    window.location.href = '/dashboard';
+                } else if (user.role === 'seeker') {
+                    window.location.href = '/shelters/available';
+                } else {
+                    window.location.href = '/';
+                }
+            });
 
         } catch (error) {
-            console.error('Erro ao encontrar abrigo e logar:', error);
+            Swal.fire({
+                title: 'Erro!',
+                text: 'Ocorreu um erro ao encontrar abrigo. Tente novamente mais tarde.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            console.error('Erro ao encontrar abrigo:', error);
         }
     };
+
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">

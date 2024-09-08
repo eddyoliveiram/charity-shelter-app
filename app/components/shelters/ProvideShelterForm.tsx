@@ -1,7 +1,8 @@
 "use client";
 import { useState } from 'react';
 import { setCookie } from 'cookies-next';
-import axios from 'axios'; // Usa o axios padrão, sem a configuração do interceptor
+import axios from 'axios';
+import Swal from 'sweetalert2';
 import { Input } from '../ui/Input';
 import { Label } from '../ui/Label';
 import { Button } from '../ui/Button';
@@ -30,8 +31,18 @@ export default function ProvideShelterForm() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Validação básica para campos em branco
+        if (!formData.name || !formData.email || !formData.phone || !formData.password || !formData.capacity || !formData.supportType || !formData.description) {
+            return Swal.fire({
+                title: 'Erro!',
+                text: 'Por favor, preencha todos os campos!',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+
         try {
-            // Faz a requisição diretamente para a API sem usar o axiosConfig
             const response = await axios.post(process.env.NEXT_PUBLIC_API_URL+'/providers/create', {
                 name: formData.name,
                 email: formData.email,
@@ -40,21 +51,19 @@ export default function ProvideShelterForm() {
                 capacity: formData.capacity,
                 support_type: formData.supportType,
                 provider_description: formData.description,
-                role: 'provider', // Define o usuário como provider
+                role: 'provider',
             });
 
             const { token, user } = response.data;
 
-            // Armazenar o token JWT no cookie
             setCookie('token', token, {
-                maxAge: 60 * 60 * 24, // 1 dia de validade
+                maxAge: 60 * 60 * 24,
                 path: '/',
                 secure: true,
                 httpOnly: false,
-                sameSite: 'Strict',
+                sameSite: 'strict',
             });
 
-            // Armazenar as informações do usuário no cookie
             setCookie('user_info', JSON.stringify({
                 id: user.id,
                 name: user.name,
@@ -65,20 +74,32 @@ export default function ProvideShelterForm() {
                 path: '/',
                 secure: true,
                 httpOnly: false,
-                sameSite: 'Strict',
+                sameSite: 'strict',
             });
 
-            // Redirecionar conforme o papel (role) do usuário
-            if (user.role === 'provider') {
-                window.location.href = '/dashboard';
-            } else if (user.role === 'seeker') {
-                window.location.href = '/shelters/available';
-            } else {
-                window.location.href = '/';
-            }
+            Swal.fire({
+                title: 'Sucesso!',
+                text: 'Abrigo fornecido com sucesso!',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                if (user.role === 'provider') {
+                    window.location.href = '/dashboard';
+                } else if (user.role === 'seeker') {
+                    window.location.href = '/shelters/available';
+                } else {
+                    window.location.href = '/';
+                }
+            });
 
         } catch (error) {
-            console.error('Erro ao fornecer abrigo e logar:', error);
+            Swal.fire({
+                title: 'Erro!',
+                text: 'Ocorreu um erro ao fornecer abrigo. Tente novamente mais tarde.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            console.error('Erro ao fornecer abrigo:', error);
         }
     };
 

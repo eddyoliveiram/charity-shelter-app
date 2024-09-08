@@ -1,11 +1,11 @@
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '../ui/Card';
-import HomeIcon from '../icons/HomeIcon';
-import PhoneIcon from '../icons/PhoneIcon';
-import UserIcon from '../icons/UserIcon';
-import UsersIcon from '../icons/UsersIcon';
-import UtensilsIcon from '../icons/UtensilsIcon';
+import UserIcon from '@/app/components/icons/UserIcon';
+import PhoneIcon from '@/app/components/icons/PhoneIcon';
+import UsersIcon from '@/app/components/icons/UsersIcon';
+import UtensilsIcon from '@/app/components/icons/UtensilsIcon';
 
-export default function ShelterList({ providers }) { // Recebe 'providers' como prop
+
+export default function ShelterList({ providers }: { providers: Array<any> }) {
     if (providers.length === 0) {
         return <p>No shelters available</p>;
     }

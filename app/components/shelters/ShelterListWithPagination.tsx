@@ -5,11 +5,11 @@ import { getCookie } from 'cookies-next';
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '../ui/Card';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPhone, faHome, faUser, faUsers, faUtensils, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { Button } from "@/app/components/ui/button";
+import { Button } from "@/app/components/ui/Button";
 import Swal from 'sweetalert2'; // Importando SweetAlert2
 
 export default function ShelterListWithPagination() {
-    const [shelters, setShelters] = useState([]);
+    const [shelters, setShelters] = useState<any[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const sheltersPerPage = 3;
     const [seekerId, setSeekerId] = useState(null); // Para armazenar o seeker_id
@@ -17,11 +17,17 @@ export default function ShelterListWithPagination() {
     useEffect(() => {
         const fetchShelters = async () => {
             try {
-                const userInfo = JSON.parse(getCookie('user_info'));
-                const userId = userInfo.id;
-                setSeekerId(userId); // Armazena o seeker_id
-                const response = await api.get(`/providers/all/${userId}`);
-                setShelters(response.data);
+                const userInfo = getCookie('user_info');
+
+                if (userInfo) {
+                    const parsedUserInfo = JSON.parse(userInfo);
+                    const userId = parsedUserInfo.id;
+                    setSeekerId(userId); // Armazena o seeker_id
+                    const response = await api.get(`/providers/all/${userId}`);
+                    setShelters(response.data);
+                } else {
+                    console.error("No user info found in cookies.");
+                }
             } catch (error) {
                 console.error("Error fetching shelters", error);
             }
@@ -34,14 +40,14 @@ export default function ShelterListWithPagination() {
     const indexOfFirstShelter = indexOfLastShelter - sheltersPerPage;
     const currentShelters = shelters.slice(indexOfFirstShelter, indexOfLastShelter);
 
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+    const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
     const pageNumbers = [];
     for (let i = 1; i <= Math.ceil(shelters.length / sheltersPerPage); i++) {
         pageNumbers.push(i);
     }
 
-    const handleRequestShelter = async (providerId) => {
+    const handleRequestShelter = async (providerId: number) => {
         Swal.fire({
             title: 'Tem certeza que deseja solicitar este abrigo?',
             text: 'Esta ação enviará sua solicitação para o provedor.',
@@ -77,7 +83,7 @@ export default function ShelterListWithPagination() {
         });
     };
 
-    const deleteRequestShelter = async (requestId) => {
+    const deleteRequestShelter = async (requestId :number) => {
         Swal.fire({
             title: 'Tem certeza que deseja cancelar esta solicitação?',
             text: 'Esta ação cancelará sua solicitação ao provedor.',

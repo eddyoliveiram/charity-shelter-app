@@ -1,5 +1,5 @@
-import Header from '@/app/components/layout/Header';
-import Footer from '@/app/components/layout/Footer';
+import Header from '@/app/components/layout/header';
+import Footer from '@/app/components/layout/footer';
 import '@/app/globals.css';
 import { ReactNode } from 'react';
 

@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Button } from "@/app/components/ui/button";
+import { Button } from "@/app/components/ui/Button";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faSignOutAlt, faClipboardList, faCheck, faTimes, faEdit } from '@fortawesome/free-solid-svg-icons';
 import { getCookie, setCookie } from 'cookies-next';
@@ -11,7 +11,7 @@ export default function ShelterDashboard() {
     const [activeTab, setActiveTab] = useState('solicitacoes');
     const [userName, setUserName] = useState('');
     const [providerId, setProviderId] = useState(null);
-    const [solicitacoes, setSolicitacoes] = useState([]);
+    const [solicitacoes, setSolicitacoes] = useState<any[]>([]);
     const [loadingSolicitacoes, setLoadingSolicitacoes] = useState(true);
     const [loadingProfile, setLoadingProfile] = useState(true);
     const [updateMessage, setUpdateMessage] = useState('');
@@ -56,7 +56,7 @@ export default function ShelterDashboard() {
     const indexOfFirstSolicitacao = indexOfLastSolicitacao - solicitacoesPerPage;
     const currentSolicitacoes = solicitacoes.slice(indexOfFirstSolicitacao, indexOfLastSolicitacao);
 
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+    const paginate = (pageNumber:number) => setCurrentPage(pageNumber);
 
     const pageNumbers = [];
     for (let i = 1; i <= Math.ceil(solicitacoes.length / solicitacoesPerPage); i++) {
@@ -106,7 +106,7 @@ export default function ShelterDashboard() {
         fetchProviderData();
     }, [providerId, activeTab]);
 
-    async function handleSubmit(event) {
+    async function handleSubmit(event : React.FormEvent) {
         event.preventDefault();
 
         // Adicionando SweetAlert para confirmação ao alterar dados
@@ -148,7 +148,7 @@ export default function ShelterDashboard() {
     }
 
     // Função para atualizar o status da solicitação com confirmação
-    async function updateRequestStatus(requestId, status) {
+    async function updateRequestStatus(requestId :number, status :string) {
         const action = status === 'Aceito' ? 'aceitar' : 'rejeitar';
 
         Swal.fire({
@@ -162,7 +162,7 @@ export default function ShelterDashboard() {
             if (result.isConfirmed) {
                 try {
                     await api.put(`/requests/${requestId}/status`, { status });
-                    setSolicitacoes((prevSolicitacoes) =>
+                    setSolicitacoes((prevSolicitacoes: any[]) =>
                         prevSolicitacoes.map((solicitacao) =>
                             solicitacao.id === requestId
                                 ? { ...solicitacao, status }

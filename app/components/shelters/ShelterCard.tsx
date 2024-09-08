@@ -1,5 +1,8 @@
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '../ui/Card';
-import { UserIcon, PhoneIcon,  UsersIcon, UtensilsIcon } from '../icons';
+import UserIcon from '@/app/components/icons/UserIcon';
+import PhoneIcon from '@/app/components/icons/PhoneIcon';
+import UsersIcon from '@/app/components/icons/UsersIcon';
+import UtensilsIcon from '@/app/components/icons/UtensilsIcon';
 
 interface ShelterCardProps {
     name: string;
