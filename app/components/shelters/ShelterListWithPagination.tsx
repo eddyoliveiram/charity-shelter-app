@@ -1,94 +1,36 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import api from '@/app/utils/axiosConfig';
+import { getCookie } from 'cookies-next';
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '../ui/Card';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPhone, faHome, faUser, faUsers, faUtensils, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Button } from "@/app/components/ui/button";
 
 export default function ShelterListWithPagination() {
-    const shelters = [
-        {
-            name: 'Casa da Maria',
-            description: 'Abrigo com capacidade para 4 pessoas, com alimentação disponível.',
-            phone: '(**) *****-****',
-            location: 'Rua das Flores, *** - Centro',
-            capacity: 4,
-            hasFood: true,
-        },
-        {
-            name: 'Casa do João',
-            description: 'Abrigo com capacidade para 2 pessoas, sem alimentação.',
-            phone: '(**) *****-****',
-            location: 'Rua das Árvores, *** - Jardim',
-            capacity: 2,
-            hasFood: false,
-        },
-        {
-            name: 'Casa da Ana',
-            description: 'Abrigo com capacidade para 6 pessoas, com alimentação disponível.',
-            phone: '(**) *****-****',
-            location: 'Rua das Nuvens, *** - Parque',
-            capacity: 6,
-            hasFood: true,
-        },
-        {
-            name: 'Casa do Pedro',
-            description: 'Abrigo com capacidade para 5 pessoas, sem alimentação.',
-            phone: '(**) *****-****',
-            location: 'Rua das Pedras, *** - Bairro Alto',
-            capacity: 5,
-            hasFood: false,
-        },
-        {
-            name: 'Casa da Júlia',
-            description: 'Abrigo com capacidade para 3 pessoas, com alimentação disponível.',
-            phone: '(**) *****-****',
-            location: 'Rua das Rosas, *** - Centro',
-            capacity: 3,
-            hasFood: true,
-        },
-        {
-            name: 'Casa do Carlos',
-            description: 'Abrigo com capacidade para 2 pessoas, com alimentação disponível.',
-            phone: '(**) *****-****',
-            location: 'Rua dos Lagos, *** - Vila Nova',
-            capacity: 2,
-            hasFood: true,
-        },
-        {
-            name: 'Casa do Ricardo',
-            description: 'Abrigo com capacidade para 6 pessoas, sem alimentação.',
-            phone: '(**) *****-****',
-            location: 'Rua dos Pássaros, *** - Bairro Novo',
-            capacity: 6,
-            hasFood: false,
-        },
-        {
-            name: 'Casa da Joana',
-            description: 'Abrigo com capacidade para 4 pessoas, com alimentação disponível.',
-            phone: '(**) *****-****',
-            location: 'Rua das Palmeiras, *** - Jardim das Flores',
-            capacity: 4,
-            hasFood: true,
-        },
-        {
-            name: 'Casa do Roberto',
-            description: 'Abrigo com capacidade para 5 pessoas, sem alimentação.',
-            phone: '(**) *****-****',
-            location: 'Rua das Acácias, *** - Vila Verde',
-            capacity: 5,
-            hasFood: false,
-        },
-    ];
-
+    const [shelters, setShelters] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const sheltersPerPage = 3;
+
+    useEffect(() => {
+        const fetchShelters = async () => {
+            try {
+                const userId = JSON.parse(getCookie('user_info')).id;
+                const response = await api.get(`/providers/all/${userId}`);
+                setShelters(response.data); // Ajuste conforme a estrutura dos dados retornados
+            } catch (error) {
+                console.error("Error fetching shelters", error);
+            }
+        };
+
+        fetchShelters();
+    }, []);
 
     const indexOfLastShelter = currentPage * sheltersPerPage;
     const indexOfFirstShelter = indexOfLastShelter - sheltersPerPage;
     const currentShelters = shelters.slice(indexOfFirstShelter, indexOfLastShelter);
 
-    const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     const pageNumbers = [];
     for (let i = 1; i <= Math.ceil(shelters.length / sheltersPerPage); i++) {
@@ -112,11 +54,9 @@ export default function ShelterListWithPagination() {
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <FontAwesomeIcon icon={faPhone} className="w-5 h-5" />
-                                    <span>{shelter.phone}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <FontAwesomeIcon icon={faHome} className="w-5 h-5" />
-                                    <span>{shelter.location}</span>
+                                    <span>
+                                        {shelter.status === 'Aceito' ? shelter.phone : '(**) *****-****'}
+                                    </span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <FontAwesomeIcon icon={faUsers} className="w-5 h-5" />
@@ -128,14 +68,27 @@ export default function ShelterListWithPagination() {
                                 </div>
                             </div>
                             <div className="flex mt-4">
-                                <Button className="bg-primary text-primary-foreground py-1 px-4 mr-2 rounded">
-                                    <FontAwesomeIcon icon={faCheck} className="mr-2" />
-                                    Solicitar
-                                </Button>
-                                <Button className="bg-destructive text-destructive-foreground py-1 px-4 rounded">
-                                    <FontAwesomeIcon icon={faTimes} className="mr-2" />
-                                    Cancelar
-                                </Button>
+                                {shelter.status === null && (
+                                    <Button className="bg-primary text-primary-foreground py-1 px-4 mr-2 rounded">
+                                        <FontAwesomeIcon icon={faCheck} className="mr-2" />
+                                        Solicitar
+                                    </Button>
+                                )}
+                                {shelter.status === 'Aguardando' && (
+                                    <>
+                                        <span className="mr-2">Status: Aguardando</span>
+                                        <Button className="bg-destructive text-destructive-foreground py-1 px-4 rounded">
+                                            <FontAwesomeIcon icon={faTimes} className="mr-2" />
+                                            Cancelar
+                                        </Button>
+                                    </>
+                                )}
+                                {shelter.status === 'Aceito' && (
+                                    <span>Status: Aceito</span>
+                                )}
+                                {shelter.status === 'Negado' && (
+                                    <span>Status: Negado</span>
+                                )}
                             </div>
                         </CardContent>
                     </Card>

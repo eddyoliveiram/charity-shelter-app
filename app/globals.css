@@ -20,6 +20,8 @@
     --accent-foreground: 220.9 39.3% 11%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 20% 98%;
+    --constructive: 120, 100%, 40%;
+    --constructive-foreground: 120, 100%, 95%;
     --border: 220 13% 91%;
     --input: 220 13% 91%;
     --ring: 224 71.4% 4.1%;

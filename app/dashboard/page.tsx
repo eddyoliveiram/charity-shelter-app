@@ -11,7 +11,19 @@ export default function ShelterDashboard() {
     const [userName, setUserName] = useState('');
     const [providerId, setProviderId] = useState(null);
     const [solicitacoes, setSolicitacoes] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loadingSolicitacoes, setLoadingSolicitacoes] = useState(true);
+    const [loadingProfile, setLoadingProfile] = useState(true);
+    const [updateMessage, setUpdateMessage] = useState('');
+
+    // State para os dados do provider
+    const [profileData, setProfileData] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        capacity: '',
+        support_type: '',
+        provider_description: ''
+    });
 
     const solicitacoesPerPage = 3;
     const [currentPage, setCurrentPage] = useState(1);
@@ -39,24 +51,70 @@ export default function ShelterDashboard() {
         const fetchSolicitacoes = async () => {
             if (providerId) {
                 try {
-                    setLoading(true);
+                    setLoadingSolicitacoes(true);
                     const response = await api.get(`/requests/provider/${providerId}`);
                     setSolicitacoes(response.data);
-                    setLoading(false);
+                    setLoadingSolicitacoes(false);
                 } catch (error) {
                     console.error('Erro ao buscar solicitações:', error);
-                    setLoading(false);
+                    setLoadingSolicitacoes(false);
                 }
             }
         };
         fetchSolicitacoes();
     }, [providerId]);
 
-    // Função para tratar o envio de dados cadastrais
-    function handleSubmit(event) {
+    useEffect(() => {
+        const fetchProviderData = async () => {
+            if (providerId && activeTab === 'dados') {
+                try {
+                    setLoadingProfile(true);
+                    const response = await api.get(`/providers/${providerId}/profile`);
+                    setProfileData(response.data);
+                    setLoadingProfile(false);
+                } catch (error) {
+                    console.error('Erro ao buscar dados do provider:', error);
+                    setLoadingProfile(false);
+                }
+            }
+        };
+        fetchProviderData();
+    }, [providerId, activeTab]);
+
+    async function handleSubmit(event) {
         event.preventDefault();
-        // Aqui você pode implementar a lógica de envio dos dados para o backend
-        console.log("Alteração de dados cadastrais submetida.");
+        try {
+            const response = await api.put('/providers/update', {
+                user_id: providerId,
+                name: profileData.name,
+                email: profileData.email,
+                phone: profileData.phone,
+                capacity: profileData.capacity,
+                support_type: profileData.support_type,
+                provider_description: profileData.provider_description
+            });
+            setUpdateMessage('Perfil atualizado com sucesso!');
+            console.log('Resposta da atualização:', response.data);
+        } catch (error) {
+            setUpdateMessage('Erro ao atualizar o perfil.');
+            console.error('Erro ao atualizar perfil:', error);
+        }
+    }
+
+    // Função para atualizar o status da solicitação
+    async function updateRequestStatus(requestId, status) {
+        try {
+            await api.put(`/requests/${requestId}/status`, { status });
+            setSolicitacoes((prevSolicitacoes) =>
+                prevSolicitacoes.map((solicitacao) =>
+                    solicitacao.id === requestId
+                        ? { ...solicitacao, status }
+                        : solicitacao
+                )
+            );
+        } catch (error) {
+            console.error('Erro ao atualizar o status da solicitação:', error);
+        }
     }
 
     return (
@@ -88,8 +146,10 @@ export default function ShelterDashboard() {
             {activeTab === 'solicitacoes' && (
                 <div className="w-full">
                     <h2 className="text-2xl font-bold mb-4">Solicitações para o seu Abrigo</h2>
-                    {loading ? (
+                    {loadingSolicitacoes ? (
                         <p>Carregando solicitações...</p>
+                    ) : solicitacoes.length === 0 ? (
+                        <p className="text-gray-600">Não há solicitações para o seu abrigo até o momento.</p>
                     ) : (
                         <>
                             <ul className="mt-4 space-y-4">
@@ -104,26 +164,48 @@ export default function ShelterDashboard() {
                                         <div>
                                             <strong>Necessidade:</strong> {solicitacao.need_type}
                                         </div>
-                                        <div className="mt-4 flex space-x-2">
-                                            <Button className="bg-primary text-primary-foreground py-1 px-4 rounded flex items-center">
-                                                <FontAwesomeIcon icon={faCheck} className="mr-2" />
-                                                Aceitar
-                                            </Button>
-                                            <Button className="bg-destructive text-destructive-foreground py-1 px-4 rounded flex items-center">
-                                                <FontAwesomeIcon icon={faTimes} className="mr-2" />
-                                                Rejeitar
-                                            </Button>
+                                        <div>
+                                            <strong>Status:</strong>
+                                            <span
+                                                className={`ml-2 font-bold ${
+                                                    solicitacao.status === 'Aceito' ? 'text-constructive' : solicitacao.status === 'Negado' ? 'text-destructive' : 'text-gray-600'
+                                                }`}
+                                            >
+                                                {solicitacao.status}
+                                            </span>
                                         </div>
+
+
+                                        {solicitacao.status === 'Aceito' && (
+                                            <div>
+                                                <strong className={''}>Telefone do Solicitante:</strong> <strong className={'text-constructive text-xl'}>{solicitacao.seeker_phone}</strong>
+                                            </div>
+                                        )}
+
+                                        {solicitacao.status === 'Aguardando' && (
+                                            <div className="mt-4 flex space-x-2">
+                                                <Button
+                                                    className="bg-primary text-primary-foreground py-1 px-4 rounded flex items-center"
+                                                    onClick={() => updateRequestStatus(solicitacao.id, 'Aceito')}>
+                                                    <FontAwesomeIcon icon={faCheck} className="mr-2"/>
+                                                    Aceitar
+                                                </Button>
+                                                <Button className="bg-destructive text-destructive-foreground py-1 px-4 rounded flex items-center" onClick={() => updateRequestStatus(solicitacao.id, 'Negado')}>
+                                                    <FontAwesomeIcon icon={faTimes} className="mr-2" />
+                                                    Rejeitar
+                                                </Button>
+                                            </div>
+                                        )}
                                     </li>
                                 ))}
                             </ul>
 
                             <div className="flex justify-center mt-6 space-x-2">
-                                {pageNumbers.map(number => (
+                                {pageNumbers.map((number) => (
                                     <button
                                         key={number}
                                         onClick={() => paginate(number)}
-                                        className={`px-4 py-2 text-lg border rounded ${currentPage === number ? 'bg-primary text-primary-foreground' : ' '}`}
+                                        className={`px-4 py-2 text-lg border rounded ${currentPage === number ? 'bg-primary text-primary-foreground' : ''}`}
                                     >
                                         {number}
                                     </button>
@@ -137,50 +219,51 @@ export default function ShelterDashboard() {
             {activeTab === 'dados' && (
                 <div className="w-full lg:w-1/2">
                     <h2 className="text-2xl font-bold mb-4">Alterar Dados Cadastrais</h2>
-                    <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <label htmlFor="name">Nome</label>
-                                <input id="name" placeholder="Seu nome" className="w-full border border-input p-2 rounded"/>
+                    {loadingProfile ? (
+                        <p>Carregando dados do perfil...</p>
+                    ) : (
+                        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label htmlFor="name">Nome</label>
+                                    <input id="name" value={profileData.name} onChange={(e) => setProfileData({ ...profileData, name: e.target.value })} className="w-full border border-input p-2 rounded" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label htmlFor="email">Email</label>
+                                    <input id="email" value={profileData.email} onChange={(e) => setProfileData({ ...profileData, email: e.target.value })} type="email" className="w-full border border-input p-2 rounded" />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label htmlFor="phone">Telefone</label>
+                                    <input id="phone" value={profileData.phone} onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })} type="tel" className="w-full border border-input p-2 rounded" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label htmlFor="capacity">Capacidade</label>
+                                    <input id="capacity" value={profileData.capacity} onChange={(e) => setProfileData({ ...profileData, capacity: e.target.value })} type="number" className="w-full border border-input p-2 rounded" />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label htmlFor="support_type">Tipo de Suporte</label>
+                                    <select id="support_type" value={profileData.support_type} onChange={(e) => setProfileData({ ...profileData, support_type: e.target.value })} className="w-full border border-input p-2 rounded">
+                                        <option value="Acomodação">Acomodação</option>
+                                        <option value="Acomodação e alimentação">Acomodação e Alimentação</option>
+                                    </select>
+                                </div>
                             </div>
                             <div className="space-y-2">
-                                <label htmlFor="email">Email</label>
-                                <input id="email" type="email" placeholder="seu@email.com" className="w-full border border-input p-2 rounded"/>
+                                <label htmlFor="provider_description">Descrição</label>
+                                <textarea id="provider_description" value={profileData.provider_description} onChange={(e) => setProfileData({ ...profileData, provider_description: e.target.value })} rows={3} className="w-full border border-input p-2 rounded"></textarea>
                             </div>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <label htmlFor="phone">Telefone</label>
-                                <input id="phone" type="tel" placeholder="(00) 00000-0000" className="w-full border border-input p-2 rounded"/>
-                            </div>
-                            <div className="space-y-2">
-                                <label htmlFor="password">Senha</label>
-                                <input id="password" type="password" placeholder="Sua senha" className="w-full border border-input p-2 rounded"/>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <label htmlFor="capacity">Capacidade</label>
-                                <input id="capacity" type="number" placeholder="Número máximo de pessoas" className="w-full border border-input p-2 rounded"/>
-                            </div>
-                            <div className="space-y-2">
-                                <label htmlFor="food">Tipo de Suporte</label>
-                                <select id="food" className="w-full border border-input p-2 rounded">
-                                    <option value="apenas-hospedagem">Apenas Hospedagem</option>
-                                    <option value="hospedagem-alimentacao">Hospedagem e Alimentação</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <label htmlFor="description">Descrição</label>
-                            <textarea id="description" rows={3} placeholder="Informações adicionais sobre seu abrigo" className="w-full border border-input p-2 rounded"></textarea>
-                        </div>
 
-                        <Button type="submit" className="w-full bg-primary text-primary-foreground py-6 flex items-center justify-center">
-                            <FontAwesomeIcon icon={faEdit} className="mr-2" />
-                            Salvar
-                        </Button>
-                    </form>
+                            <Button type="submit" className="w-full bg-primary text-primary-foreground py-6 flex items-center justify-center">
+                                <FontAwesomeIcon icon={faEdit} className="mr-2" />
+                                Salvar
+                            </Button>
+                        </form>
+                    )}
+                    {updateMessage && <p className="mt-4 text-center text-green-600">{updateMessage}</p>}
                 </div>
             )}
         </div>

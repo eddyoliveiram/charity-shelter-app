@@ -1,3 +1,7 @@
+"use client";
+import { useState } from 'react';
+import { setCookie } from 'cookies-next';
+import axios from 'axios'; // Usa o axios padrão, sem a configuração do interceptor
 import { Input } from '../ui/Input';
 import { Label } from '../ui/Label';
 import { Button } from '../ui/Button';
@@ -5,10 +9,77 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectI
 import { Textarea } from '../ui/Textarea';
 
 export default function ProvideShelterForm() {
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        password: '',
+        capacity: '',
+        supportType: '',
+        description: '',
+    });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { id, value } = e.target;
+        setFormData((prev) => ({ ...prev, [id]: value }));
+    };
+
+    const handleSelectChange = (value: string) => {
+        setFormData((prev) => ({ ...prev, supportType: value }));
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        window.location.href = '/dashboard';
+        try {
+            // Faz a requisição diretamente para a API sem usar o axiosConfig
+            const response = await axios.post('http://localhost:3001/providers/create', {
+                name: formData.name,
+                email: formData.email,
+                phone: formData.phone,
+                password: formData.password,
+                capacity: formData.capacity,
+                support_type: formData.supportType,
+                provider_description: formData.description,
+                role: 'provider', // Define o usuário como provider
+            });
+
+            const { token, user } = response.data;
+
+            // Armazenar o token JWT no cookie
+            setCookie('token', token, {
+                maxAge: 60 * 60 * 24, // 1 dia de validade
+                path: '/',
+                secure: true,
+                httpOnly: false,
+                sameSite: 'Strict',
+            });
+
+            // Armazenar as informações do usuário no cookie
+            setCookie('user_info', JSON.stringify({
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            }), {
+                maxAge: 60 * 60 * 24,
+                path: '/',
+                secure: true,
+                httpOnly: false,
+                sameSite: 'Strict',
+            });
+
+            // Redirecionar conforme o papel (role) do usuário
+            if (user.role === 'provider') {
+                window.location.href = '/dashboard';
+            } else if (user.role === 'seeker') {
+                window.location.href = '/shelters/available';
+            } else {
+                window.location.href = '/';
+            }
+
+        } catch (error) {
+            console.error('Erro ao fornecer abrigo e logar:', error);
+        }
     };
 
     return (
@@ -16,38 +87,38 @@ export default function ProvideShelterForm() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="name">Nome</Label>
-                    <Input id="name" placeholder="Seu nome" />
+                    <Input id="name" value={formData.name} onChange={handleInputChange} placeholder="Seu nome" />
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" placeholder="seu@email.com"  />
+                    <Input id="email" value={formData.email} onChange={handleInputChange} type="email" placeholder="seu@email.com" />
                 </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="phone">Telefone</Label>
-                    <Input id="phone" type="tel" placeholder="(00) 00000-0000" />
+                    <Input id="phone" value={formData.phone} onChange={handleInputChange} type="tel" placeholder="(00) 00000-0000" />
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="password">Senha</Label>
-                    <Input id="password" type="password" placeholder="Sua senha" />
+                    <Input id="password" value={formData.password} onChange={handleInputChange} type="password" placeholder="Sua senha" />
                 </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="capacity">Capacidade</Label>
-                    <Input id="capacity" type="number" placeholder="Número máximo de pessoas" />
+                    <Input id="capacity" value={formData.capacity} onChange={handleInputChange} type="number" placeholder="Número máximo de pessoas" />
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="food">Tipo de Suporte</Label>
-                    <Select id="food">
+                    <Label htmlFor="supportType">Tipo de Suporte</Label>
+                    <Select onValueChange={handleSelectChange}>
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder="Selecione" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
-                                <SelectItem value="apenas-hospedagem">Apenas Hospedagem</SelectItem>
-                                <SelectItem value="hospedagem-alimentacao">Hospedagem e Alimentação</SelectItem>
+                                <SelectItem value="Acomodação">Acomodação</SelectItem>
+                                <SelectItem value="Acomodação e alimentação">Acomodação e alimentação</SelectItem>
                             </SelectGroup>
                         </SelectContent>
                     </Select>
@@ -55,7 +126,7 @@ export default function ProvideShelterForm() {
             </div>
             <div className="space-y-2">
                 <Label htmlFor="description">Descrição</Label>
-                <Textarea id="description" rows={3} placeholder="Informações adicionais sobre seu abrigo" />
+                <Textarea id="description" value={formData.description} onChange={handleInputChange} rows={3} placeholder="Informações adicionais sobre seu abrigo" />
             </div>
             <Button type="submit" className="w-full py-6">Fornecer Abrigo</Button>
         </form>
