@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/app/components/ui/button";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faSignOutAlt, faClipboardList, faCheck, faTimes, faEdit } from '@fortawesome/free-solid-svg-icons';
-import { getCookie } from 'cookies-next';
+import {getCookie, setCookie} from 'cookies-next';
 import api from '@/app/utils/axiosConfig';
 
 export default function ShelterDashboard() {
@@ -93,6 +93,12 @@ export default function ShelterDashboard() {
                 support_type: profileData.support_type,
                 provider_description: profileData.provider_description
             });
+
+            const updatedUserInfo = { id: providerId, name: profileData.name, email: profileData.email };
+            setCookie('user_info', JSON.stringify(updatedUserInfo));
+
+            setUserName(profileData.name);
+
             setUpdateMessage('Perfil atualizado com sucesso!');
             console.log('Resposta da atualização:', response.data);
         } catch (error) {
@@ -154,7 +160,8 @@ export default function ShelterDashboard() {
                         <>
                             <ul className="mt-4 space-y-4">
                                 {currentSolicitacoes.map((solicitacao, index) => (
-                                    <li key={index} className="border border-border p-4 bg-card text-card-foreground rounded-lg shadow-sm">
+                                    <li key={index}
+                                        className="border border-border p-4 bg-card text-card-foreground rounded-lg shadow-sm">
                                         <div>
                                             <strong>Nome:</strong> {solicitacao.seeker_name}
                                         </div>
@@ -164,23 +171,27 @@ export default function ShelterDashboard() {
                                         <div>
                                             <strong>Necessidade:</strong> {solicitacao.need_type}
                                         </div>
-                                        <div>
-                                            <strong>Status:</strong>
-                                            <span
-                                                className={`ml-2 font-bold ${
-                                                    solicitacao.status === 'Aceito' ? 'text-constructive' : solicitacao.status === 'Negado' ? 'text-destructive' : 'text-gray-600'
-                                                }`}
-                                            >
-                                                {solicitacao.status}
-                                            </span>
-                                        </div>
-
-
                                         {solicitacao.status === 'Aceito' && (
                                             <div>
-                                                <strong className={''}>Telefone do Solicitante:</strong> <strong className={'text-constructive text-xl'}>{solicitacao.seeker_phone}</strong>
+                                                <strong className={''}>Telefone do Solicitante:</strong> <strong
+                                                className={'text-constructive text-xl'}>{solicitacao.seeker_phone}</strong>
                                             </div>
                                         )}
+
+                                        <div>
+                                            <b>Status:</b>
+                                            <span
+                                            className={`ml-1 font-bold ${
+                                                solicitacao.status === 'Aceito' ? 'text-constructive' : solicitacao.status === 'Negado' ? 'text-destructive' : 'text-gray-600'
+                                            }`}
+                                        >
+                                            <strong>{solicitacao.status}</strong>
+                                        </span>
+
+                                            {solicitacao.status === 'Aceito' && (
+                                                <div className="mt-2">Entre em contato pelo número acima.</div>
+                                            )}
+                                        </div>
 
                                         {solicitacao.status === 'Aguardando' && (
                                             <div className="mt-4 flex space-x-2">
@@ -190,8 +201,10 @@ export default function ShelterDashboard() {
                                                     <FontAwesomeIcon icon={faCheck} className="mr-2"/>
                                                     Aceitar
                                                 </Button>
-                                                <Button className="bg-destructive text-destructive-foreground py-1 px-4 rounded flex items-center" onClick={() => updateRequestStatus(solicitacao.id, 'Negado')}>
-                                                    <FontAwesomeIcon icon={faTimes} className="mr-2" />
+                                                <Button
+                                                    className="bg-destructive text-destructive-foreground py-1 px-4 rounded flex items-center"
+                                                    onClick={() => updateRequestStatus(solicitacao.id, 'Negado')}>
+                                                    <FontAwesomeIcon icon={faTimes} className="mr-2"/>
                                                     Rejeitar
                                                 </Button>
                                             </div>
