@@ -1,4 +1,6 @@
-"use client";
+"use client"
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import ProvideShelterForm from '@/app/components/shelters/ProvideShelterForm';
 import FindShelterForm from '@/app/components/shelters/FindShelterForm';
 import ShelterList from '@/app/components/shelters/ShelterList';
@@ -7,17 +9,32 @@ import { Separator } from '@/app/components/ui/Separator';
 import HomeIcon from "@/app/components/icons/HomeIcon";
 import SearchIcon from "@/app/components/icons/SearchIcon";
 import {Button} from "@/app/components/ui/button";
+
 export default function HomePage() {
+    const [providers, setProviders] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchProviders = async () => {
+            try {
+                const response = await axios.get('http://localhost:3001/providers/random');
+                setProviders(response.data);
+            } catch (error) {
+                setError('Erro ao buscar dados');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProviders();
+    }, []);
+
+    if (loading) return <p>Loading...</p>;
+    if (error) return <p>{error}</p>;
 
     return (
         <div>
-            {/*<div className="mt-8 text-center text-2xl">*/}
-            {/*    <p>Já tem uma conta?*/}
-            {/*        <button className="mx-1 text-blue-900 text-2xl">*/}
-            {/*            Clique aqui.*/}
-            {/*        </button>*/}
-            {/*    </p>*/}
-            {/*</div>*/}
             <div className="flex flex-col items-center">
                 <div className="flex items-center space-x-4 mt-6">
                     <img
@@ -66,13 +83,13 @@ export default function HomePage() {
 
                 <Separator className="my-12"/>
 
-                <div className="space-y-6">
+                <div className="space-y-6 mb-10">
                     <ShelterHeader
                         title="Abrigos Disponíveis"
                         subtitle="Veja alguns dos abrigos temporários disponíveis."
                         icon={null}
                     />
-                    <ShelterList/>
+                    <ShelterList providers={providers} />
                 </div>
             </div>
         </div>

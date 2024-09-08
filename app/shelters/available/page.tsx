@@ -18,13 +18,15 @@ export default function AvailableShelters() {
         <div className="container mx-auto py-12">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-bold">Olá, Fulano.</h1>
-                <a href="/" className="text-xl py-2 px-4 bg-secondary text-secondary-foreground rounded-md">
+                <a href="/logout"
+                   className="flex items-center text-lg py-2 px-4 bg-secondary text-secondary-foreground rounded-md">
                     <FontAwesomeIcon icon={faSignOutAlt} className="mr-2"/> Logout
                 </a>
             </div>
 
             <div className="mb-6">
-                <div className="flex flex-col sm:flex-row sm:justify-start items-center space-y-2 sm:space-y-0 sm:space-x-2 mb-6">
+                <div
+                    className="flex flex-col sm:flex-row sm:justify-start items-center space-y-2 sm:space-y-0 sm:space-x-2 mb-6">
                     <button
                         className={`flex items-center text-lg sm:text-xl py-4 px-6 w-full sm:w-auto rounded-md  ${activeTab === 'shelters' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}
                         onClick={() => setActiveTab('shelters')}
