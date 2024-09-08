@@ -6,6 +6,7 @@ import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '../ui
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPhone, faHome, faUser, faUsers, faUtensils, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Button } from "@/app/components/ui/button";
+import Swal from 'sweetalert2'; // Importando SweetAlert2
 
 export default function ShelterListWithPagination() {
     const [shelters, setShelters] = useState([]);
@@ -41,44 +42,72 @@ export default function ShelterListWithPagination() {
     }
 
     const handleRequestShelter = async (providerId) => {
-        try {
-            const response = await api.post('/seekers/request', {
-                seeker_id: seekerId,
-                provider_id: providerId
-            });
+        Swal.fire({
+            title: 'Tem certeza que deseja solicitar este abrigo?',
+            text: 'Esta ação enviará sua solicitação para o provedor.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sim, solicitar!',
+            cancelButtonText: 'Cancelar'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const response = await api.post('/seekers/request', {
+                        seeker_id: seekerId,
+                        provider_id: providerId
+                    });
 
-            // Atualiza o estado local dos abrigos
-            setShelters(prevShelters =>
-                prevShelters.map(shelter =>
-                    shelter.user_id === providerId
-                        ? { ...shelter, status: 'Aguardando' } // Atualiza o status para "Aguardando"
-                        : shelter
-                )
-            );
+                    // Atualiza o estado local dos abrigos
+                    setShelters(prevShelters =>
+                        prevShelters.map(shelter =>
+                            shelter.user_id === providerId
+                                ? { ...shelter, status: 'Aguardando' } // Atualiza o status para "Aguardando"
+                                : shelter
+                        )
+                    );
 
-            console.log('Solicitação feita com sucesso:', response.data);
-        } catch (error) {
-            console.error('Erro ao solicitar abrigo:', error);
-        }
+                    Swal.fire('Solicitado!', 'Você solicitou o abrigo com sucesso.', 'success');
+                } catch (error) {
+                    Swal.fire('Erro!', 'Houve um erro ao solicitar o abrigo.', 'error');
+                    console.error('Erro ao solicitar abrigo:', error);
+                }
+            }
+        });
     };
 
     const deleteRequestShelter = async (requestId) => {
-        try {
-            await api.delete(`/seekers/request/${requestId}`);
+        Swal.fire({
+            title: 'Tem certeza que deseja cancelar esta solicitação?',
+            text: 'Esta ação cancelará sua solicitação ao provedor.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sim, cancelar!',
+            cancelButtonText: 'Manter'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await api.delete(`/seekers/request/${requestId}`);
 
-            // Remove a solicitação da lista atual de abrigos
-            setShelters(prevShelters =>
-                prevShelters.map(shelter =>
-                    shelter.request_id === requestId
-                        ? { ...shelter, status: null } // Reseta o status para null
-                        : shelter
-                )
-            );
+                    // Remove a solicitação da lista atual de abrigos
+                    setShelters(prevShelters =>
+                        prevShelters.map(shelter =>
+                            shelter.request_id === requestId
+                                ? { ...shelter, status: null } // Reseta o status para null
+                                : shelter
+                        )
+                    );
 
-            console.log('Solicitação cancelada com sucesso!');
-        } catch (error) {
-            console.error('Erro ao cancelar a solicitação:', error);
-        }
+                    Swal.fire('Cancelado!', 'Você cancelou a solicitação com sucesso.', 'success');
+                } catch (error) {
+                    Swal.fire('Erro!', 'Houve um erro ao cancelar a solicitação.', 'error');
+                    console.error('Erro ao cancelar a solicitação:', error);
+                }
+            }
+        });
     };
 
     return (

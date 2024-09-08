@@ -3,8 +3,9 @@ import { useState, useEffect } from "react";
 import { Button } from "@/app/components/ui/button";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faSignOutAlt, faClipboardList, faCheck, faTimes, faEdit } from '@fortawesome/free-solid-svg-icons';
-import {getCookie, setCookie} from 'cookies-next';
+import { getCookie, setCookie } from 'cookies-next';
 import api from '@/app/utils/axiosConfig';
+import Swal from 'sweetalert2';
 
 export default function ShelterDashboard() {
     const [activeTab, setActiveTab] = useState('solicitacoes');
@@ -14,6 +15,30 @@ export default function ShelterDashboard() {
     const [loadingSolicitacoes, setLoadingSolicitacoes] = useState(true);
     const [loadingProfile, setLoadingProfile] = useState(true);
     const [updateMessage, setUpdateMessage] = useState('');
+
+    const handleLogout = () => {
+        const userInfo = getCookie('user_info');
+        const user = userInfo ? JSON.parse(userInfo) : null;
+        const userRole = user ? user.role : null; // Obtém o tipo de usuário (seeker ou provider)
+
+        Swal.fire({
+            title: 'Tem certeza que deseja sair?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sim, sair',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Remove os cookies e redireciona com base no tipo de usuário
+                setCookie('token', '', { maxAge: -1, path: '/' });
+                setCookie('user_info', '', { maxAge: -1, path: '/' });
+                window.location.href = '/login'; // Redireciona para a página de login
+            }
+        });
+    };
+
 
     // State para os dados do provider
     const [profileData, setProfileData] = useState({
@@ -83,56 +108,90 @@ export default function ShelterDashboard() {
 
     async function handleSubmit(event) {
         event.preventDefault();
-        try {
-            const response = await api.put('/providers/update', {
-                user_id: providerId,
-                name: profileData.name,
-                email: profileData.email,
-                phone: profileData.phone,
-                capacity: profileData.capacity,
-                support_type: profileData.support_type,
-                provider_description: profileData.provider_description
-            });
 
-            const updatedUserInfo = { id: providerId, name: profileData.name, email: profileData.email };
-            setCookie('user_info', JSON.stringify(updatedUserInfo));
+        // Adicionando SweetAlert para confirmação ao alterar dados
+        Swal.fire({
+            title: 'Você tem certeza?',
+            text: "Você quer atualizar seus dados?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sim, atualizar!'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const response = await api.put('/providers/update', {
+                        user_id: providerId,
+                        name: profileData.name,
+                        email: profileData.email,
+                        phone: profileData.phone,
+                        capacity: profileData.capacity,
+                        support_type: profileData.support_type,
+                        provider_description: profileData.provider_description
+                    });
 
-            setUserName(profileData.name);
+                    const updatedUserInfo = { id: providerId, name: profileData.name, email: profileData.email };
+                    setCookie('user_info', JSON.stringify(updatedUserInfo));
 
-            setUpdateMessage('Perfil atualizado com sucesso!');
-            console.log('Resposta da atualização:', response.data);
-        } catch (error) {
-            setUpdateMessage('Erro ao atualizar o perfil.');
-            console.error('Erro ao atualizar perfil:', error);
-        }
+                    setUserName(profileData.name);
+
+                    setUpdateMessage('Perfil atualizado com sucesso!');
+                    Swal.fire('Atualizado!', 'Seus dados foram atualizados.', 'success');
+                } catch (error) {
+                    setUpdateMessage('Erro ao atualizar o perfil.');
+                    Swal.fire('Erro!', 'Houve um erro ao atualizar seus dados.', 'error');
+                    console.error('Erro ao atualizar perfil:', error);
+                }
+            }
+        });
     }
 
-    // Função para atualizar o status da solicitação
+    // Função para atualizar o status da solicitação com confirmação
     async function updateRequestStatus(requestId, status) {
-        try {
-            await api.put(`/requests/${requestId}/status`, { status });
-            setSolicitacoes((prevSolicitacoes) =>
-                prevSolicitacoes.map((solicitacao) =>
-                    solicitacao.id === requestId
-                        ? { ...solicitacao, status }
-                        : solicitacao
-                )
-            );
-        } catch (error) {
-            console.error('Erro ao atualizar o status da solicitação:', error);
-        }
+        const action = status === 'Aceito' ? 'aceitar' : 'rejeitar';
+
+        Swal.fire({
+            title: `Você quer ${action} esta solicitação?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: `Sim, ${action}!`
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await api.put(`/requests/${requestId}/status`, { status });
+                    setSolicitacoes((prevSolicitacoes) =>
+                        prevSolicitacoes.map((solicitacao) =>
+                            solicitacao.id === requestId
+                                ? { ...solicitacao, status }
+                                : solicitacao
+                        )
+                    );
+                    Swal.fire(`${action.charAt(0).toUpperCase() + action.slice(1)}!`, `A solicitação foi ${action} com sucesso.`, 'success');
+                } catch (error) {
+                    console.error('Erro ao atualizar o status da solicitação:', error);
+                    Swal.fire('Erro!', 'Não foi possível atualizar o status da solicitação.', 'error');
+                }
+            }
+        });
     }
 
     return (
         <div className="container mx-auto py-8 px-4">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-bold">Olá, {userName || 'Usuário'}.</h1>
-                <a href="/logout" className="flex items-center text-lg py-2 px-4 bg-secondary text-secondary-foreground rounded-md">
-                    <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" /> Logout
-                </a>
+                <div>
+                    <a onClick={handleLogout}
+                       className="flex items-center text-lg py-2 px-4 bg-secondary text-secondary-foreground rounded-md cursor-pointer">
+                        <FontAwesomeIcon icon={faSignOutAlt} className="mr-2"/> Logout
+                    </a>
+                </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:justify-start items-center space-y-2 sm:space-y-0 sm:space-x-2 mb-6">
+            <div
+                className="flex flex-col sm:flex-row sm:justify-start items-center space-y-2 sm:space-y-0 sm:space-x-2 mb-6">
                 <button
                     className={`flex items-center text-lg sm:text-xl py-4 px-6 w-full sm:w-auto rounded-md ${activeTab === 'solicitacoes' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}
                     onClick={() => setActiveTab('solicitacoes')}
@@ -181,10 +240,10 @@ export default function ShelterDashboard() {
                                         <div>
                                             <b>Status:</b>
                                             <span
-                                            className={`ml-1 font-bold ${
-                                                solicitacao.status === 'Aceito' ? 'text-constructive' : solicitacao.status === 'Negado' ? 'text-destructive' : 'text-gray-600'
-                                            }`}
-                                        >
+                                                className={`ml-1 font-bold ${
+                                                    solicitacao.status === 'Aceito' ? 'text-constructive' : solicitacao.status === 'Negado' ? 'text-destructive' : 'text-gray-600'
+                                                }`}
+                                            >
                                             <strong>{solicitacao.status}</strong>
                                         </span>
 

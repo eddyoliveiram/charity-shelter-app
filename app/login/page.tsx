@@ -1,9 +1,10 @@
 "use client";
 import { useState } from 'react';
-import axios from 'axios';
-import { Button } from "@/app/components/ui/button";
+import api from '@/app/utils/axiosConfig';
 import { setCookie } from 'cookies-next';
+import { Button } from "@/app/components/ui/button";
 import Link from "next/link";
+import Swal from 'sweetalert2'; // Importando SweetAlert2
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -15,7 +16,7 @@ export default function Login() {
 
         try {
             // Faz a requisição de login para a API
-            const response = await axios.post('http://localhost:3001/auth/login', {
+            const response = await api.post('/auth/login', {
                 email,
                 password,
             });
@@ -46,15 +47,34 @@ export default function Login() {
                 sameSite: 'Strict',
             });
 
-            if (user.role === 'provider') {
-                window.location.href = '/dashboard';
-            } else if (user.role === 'seeker') {
-                window.location.href = '/shelters/available';
-            } else {
-                window.location.href = '/';
-            }
+            // Exibe o SweetAlert de sucesso
+            Swal.fire({
+                icon: 'success',
+                title: 'Login bem-sucedido!',
+                text: 'Redirecionando...',
+                showConfirmButton: false,
+                timer: 2000
+            });
+
+            // Redirecionamento baseado no papel do usuário
+            setTimeout(() => {
+                if (user.role === 'provider') {
+                    window.location.href = '/dashboard';
+                } else if (user.role === 'seeker') {
+                    window.location.href = '/shelters/available';
+                } else {
+                    window.location.href = '/';
+                }
+            }, 2000);
         } catch (error) {
-            setError(error.response?.data?.message || 'Login failed');
+            // Exibe o SweetAlert de erro
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro no login',
+                text: error.response?.data?.message || 'Falha no login',
+            });
+
+            setError(error.response?.data?.message || 'Falha no login');
         }
     };
 

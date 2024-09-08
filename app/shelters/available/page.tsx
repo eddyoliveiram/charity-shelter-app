@@ -6,7 +6,8 @@ import { faUser, faSignOutAlt, faHouseUser, faSave, faUserCog } from '@fortaweso
 import { getCookie, setCookie } from 'cookies-next';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/app/components/ui/select";
 import ShelterListWithPagination from '@/app/components/shelters/ShelterListWithPagination'
-import api from '@/app/utils/axiosConfig'; // Certifique-se de que este caminho está correto
+import api from '@/app/utils/axiosConfig';
+import Swal from "sweetalert2"; // Certifique-se de que este caminho está correto
 
 export default function ShelterDashboard() {
     const [activeTab, setActiveTab] = useState('shelters');
@@ -22,6 +23,25 @@ export default function ShelterDashboard() {
         need_type: '',
         seeker_description: ''
     });
+
+    // Função de logout com SweetAlert2
+    const handleLogout = () => {
+        Swal.fire({
+            title: 'Tem certeza que deseja sair?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sim, sair',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                setCookie('token', '', { maxAge: -1, path: '/' });
+                setCookie('user_info', '', { maxAge: -1, path: '/' });
+                window.location.href = '/login'; // Redireciona para a página de login
+            }
+        });
+    };
 
     useEffect(() => {
         const userInfo = getCookie('user_info');
@@ -51,36 +71,102 @@ export default function ShelterDashboard() {
 
     async function handleSubmit(event) {
         event.preventDefault();
-        try {
-            const response = await api.put('/seekers/update', {
-                user_id: seekerId,
-                name: profileData.name,
-                email: profileData.email,
-                phone: profileData.phone,
-                group_size: profileData.group_size,
-                need_type: profileData.need_type,
-                seeker_description: profileData.seeker_description
-            });
 
-            const updatedUserInfo = { id: seekerId, name: profileData.name, email: profileData.email };
-            setCookie('user_info', JSON.stringify(updatedUserInfo));
+        Swal.fire({
+            title: 'Você tem certeza?',
+            text: "Você quer atualizar seus dados?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sim, atualizar!'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const response = await api.put('/seekers/update', {
+                        user_id: seekerId,
+                        name: profileData.name,
+                        email: profileData.email,
+                        phone: profileData.phone,
+                        group_size: profileData.group_size,
+                        need_type: profileData.need_type,
+                        seeker_description: profileData.seeker_description
+                    });
 
-            setUserName(profileData.name);
+                    const updatedUserInfo = { id: seekerId, name: profileData.name, email: profileData.email };
+                    setCookie('user_info', JSON.stringify(updatedUserInfo));
 
-            setUpdateMessage('Perfil atualizado com sucesso!');
-            console.log('Resposta da atualização:', response.data);
-        } catch (error) {
-            setUpdateMessage('Erro ao atualizar o perfil.');
-            console.error('Erro ao atualizar perfil:', error);
-        }
+                    setUserName(profileData.name);
+
+                    setUpdateMessage('Perfil atualizado com sucesso!');
+                    Swal.fire('Atualizado!', 'Seus dados foram atualizados com sucesso.', 'success');
+                } catch (error) {
+                    setUpdateMessage('Erro ao atualizar o perfil.');
+                    Swal.fire('Erro!', 'Houve um erro ao atualizar seus dados.', 'error');
+                    console.error('Erro ao atualizar perfil:', error);
+                }
+            }
+        });
     }
+
+    // Função para solicitar abrigo com SweetAlert2
+    const handleRequestShelter = async (providerId) => {
+        Swal.fire({
+            title: 'Tem certeza que deseja solicitar este abrigo?',
+            text: 'Esta ação enviará sua solicitação para o provedor.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sim, solicitar!',
+            cancelButtonText: 'Cancelar'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const response = await api.post('/seekers/request', {
+                        seeker_id: seekerId,
+                        provider_id: providerId
+                    });
+                    Swal.fire('Solicitado!', 'Você solicitou o abrigo com sucesso.', 'success');
+                } catch (error) {
+                    Swal.fire('Erro!', 'Houve um erro ao solicitar o abrigo.', 'error');
+                    console.error('Erro ao solicitar abrigo:', error);
+                }
+            }
+        });
+    };
+
+    // Função para cancelar a solicitação com SweetAlert2
+    const handleCancelRequest = async (requestId) => {
+        Swal.fire({
+            title: 'Tem certeza que deseja cancelar esta solicitação?',
+            text: 'Esta ação cancelará sua solicitação ao provedor.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sim, cancelar!',
+            cancelButtonText: 'Manter'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const response = await api.delete(`/seekers/request/${requestId}`);
+                    Swal.fire('Cancelado!', 'Você cancelou a solicitação com sucesso.', 'success');
+                } catch (error) {
+                    Swal.fire('Erro!', 'Houve um erro ao cancelar a solicitação.', 'error');
+                    console.error('Erro ao cancelar solicitação:', error);
+                }
+            }
+        });
+    };
 
     return (
         <div className="container mx-auto py-12">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-bold">Olá, {userName || ''}.</h1>
-                <a href="/logout" className="flex items-center text-lg py-2 px-4 bg-secondary text-secondary-foreground rounded-md">
-                    <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" /> Logout
+                <a onClick={handleLogout}
+                   className="flex items-center text-lg py-2 px-4 bg-secondary text-secondary-foreground rounded-md cursor-pointer">
+                    <FontAwesomeIcon icon={faSignOutAlt} className="mr-2"/> Logout
                 </a>
             </div>
 
@@ -107,8 +193,7 @@ export default function ShelterDashboard() {
                 <div>
                     <h1 className="text-2xl font-bold mb-4">Abrigos Disponíveis</h1>
                     <p>Abaixo estão os abrigos temporários disponíveis para você.</p>
-                    {/* Componente ShelterListWithPagination deve ser implementado */}
-                    <ShelterListWithPagination />
+                    <ShelterListWithPagination handleRequestShelter={handleRequestShelter} handleCancelRequest={handleCancelRequest} />
                 </div>
             )}
 
