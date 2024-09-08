@@ -18,7 +18,7 @@ export default function HomePage() {
     useEffect(() => {
         const fetchProviders = async () => {
             try {
-                const response = await axios.get('http://localhost:3001/providers/random');
+                const response = await axios.get(process.env.NEXT_PUBLIC_API_URL+'/providers/random');
                 setProviders(response.data);
             } catch (error) {
                 setError('Erro ao buscar dados');

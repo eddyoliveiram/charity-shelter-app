@@ -32,7 +32,7 @@ export default function FindShelterForm() {
         e.preventDefault();
         try {
             // Faz a requisição diretamente para a API sem usar o axiosConfig
-            const response = await axios.post('http://localhost:3001/seekers/create', {
+            const response = await axios.post(process.env.NEXT_PUBLIC_API_URL+'/seekers/create', {
                 name: formData.name,
                 email: formData.email,
                 phone: formData.phone,
